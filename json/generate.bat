@@ -1,0 +1,1 @@
+dart c:\Projects2\flutter2\nsg_generator\bin\nsgCodeGenerator.dart c:\Projects2\flutter_get\cognitive_training\json -dart

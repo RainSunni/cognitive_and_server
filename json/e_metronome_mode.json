@@ -1,0 +1,19 @@
+{
+    "values": [
+        {
+            "codeName": "Normal",
+            "name": "Нормальный",
+            "value": "0"
+        },
+        {
+            "codeName": "Linear",
+            "name": "Линейный",
+            "value": "1"
+        },
+        {
+            "codeName": "Percentage",
+            "name": "Процентный",
+            "value": "2"
+        }
+    ]
+}

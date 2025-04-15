@@ -1,0 +1,29 @@
+{
+    "typeName": "FavoriteItem",
+    "databaseType": "Избранное",
+    "databaseTypeNamespace": "CognitiveTraining.Метаданные.Справочники",
+    "fields": [
+        {
+            "name": "Id",
+            "databaseName": "Идентификатор",
+            "type": "String",
+            "isPrimary": "true"
+        },
+        {
+            "name": "Name",
+            "databaseName": "Наименование",
+            "description": "Имя",
+            "type": "String"
+        },
+        {
+            "name": "FavoriteObject",
+            "databaseName": "Объект",
+            "type": "UntypedReference<Training>"
+        },
+        {
+            "name": "UserId",
+            "databaseName": "Пользователь",
+            "type": "Guid"
+        }
+    ]
+}

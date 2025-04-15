@@ -1,0 +1,29 @@
+[
+    {
+        "type": "File",
+        "name": "c:\\work\\zenkov\\cognitive_training\\lib\\model\\data_controller.dart",
+        "parent_id": null,
+        "fsPath": "c:\\work\\zenkov\\cognitive_training\\lib\\model\\data_controller.dart",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "1Da5gxbiG6R4jWk8"
+    },
+    {
+        "type": "File",
+        "name": "c:\\work\\zenkov\\cognitive_training\\lib\\widgets\\training_screen.dart",
+        "parent_id": null,
+        "fsPath": "c:\\work\\zenkov\\cognitive_training\\lib\\widgets\\training_screen.dart",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "fXCiA6dLGklcMDWz"
+    },
+    {
+        "type": "File",
+        "name": "c:\\work\\zenkov\\cognitive_training\\lib\\app_pages.dart",
+        "parent_id": null,
+        "fsPath": "c:\\work\\zenkov\\cognitive_training\\lib\\app_pages.dart",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "DoFUmvjb57raQlkZ"
+    }
+]

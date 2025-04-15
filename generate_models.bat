@@ -1,0 +1,1 @@
+dart ..\nsg_generator\bin\nsgCodeGenerator.dart .\json -dart

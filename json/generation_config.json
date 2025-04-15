@@ -1,0 +1,105 @@
+{
+    "targetFramework": "net472",
+    "cSharpPath": "F:/Users/Mikhail/NSG/cognitive_training_server",
+    "dartPath": "c:/Projects2/flutter_get/cognitive_training/lib/model",
+    "cSharpNamespace": "CognitiveTrainingServer",
+    "applicationName": "cognitive_training",
+    "useStaticDatabaseNames": "true",
+    "controller": [
+        {
+            "className": "DataController",
+            "apiPrefix": "Api",
+            "implControllerName": "DataStrategy",
+            "implAuthControllerName": "AuthStrategy",
+            "useAuthorization": "true",
+            "dataType": "NsgDataItem",
+            "method": [
+                {
+                    "name": "Training",
+                    "authorize": "user",
+                    "getterType": "post",
+                    "allowPost": "true",
+                    "dataTypeFile": "training.json"
+                },
+                {
+                    "name": "TrainingColors",
+                    "authorize": "user",
+                    "getterType": "post",
+                    "allowPost": "true",
+                    "dataTypeFile": "training_colors.json"
+                },
+                {
+                    "name": "TrainingMath",
+                    "authorize": "user",
+                    "getterType": "post",
+                    "allowPost": "true",
+                    "dataTypeFile": "training_math.json"
+                },
+                {
+                    "name": "TrainingMetronom",
+                    "authorize": "user",
+                    "getterType": "post",
+                    "allowPost": "true",
+                    "dataTypeFile": "training_metronom.json"
+                },
+                {
+                    "name": "FavoriteItem",
+                    "authorize": "user",
+                    "getterType": "post",
+                    "allowPost": "true",
+                    "dataTypeFile": "favorite_item.json"
+                },
+                {
+                    "name": "TrainingSeries",
+                    "description": "Серии",
+                    "authorize": "user",
+                    "getterType": "post",
+                    "allowPost": "true",
+                    "allowDelete": "true",
+                    "dataTypeFile": "training_series.json"
+                },
+                {
+                    "name": "TrainingSeriesTableRow",
+                    "description": "Серии.Таблица",
+                    "allowGetter": "false",
+                    "dataTypeFile": "training_series_table_row.json"
+                },
+                {
+                    "name": "UserSettings",
+                    "authorize": "user",
+                    "getterType": "post",
+                    "allowPost": "true",
+                    "dataTypeFile": "user_settings.json"
+                },
+                {
+                    "name": "ExchangeRules",
+                    "description": "ПравилаОбмена",
+                    "authorize": "user",
+                    "getterType": "post",
+                    "allowPost": "true",
+                    "allowDelete": "true",
+                    "dataTypeFile": "exchange_rules.json"
+                },
+                {
+                    "name": "ExchangeRulesMergingTable",
+                    "description": "ПравилаОбмена.ПравилаСлияния",
+                    "allowGetter": "false",
+                    "dataTypeFile": "exchange_rules_merging_table.json"
+                },
+                {
+                    "name": "Device",
+                    "description": "Подключаемые устройства",
+                    "dataTypeFile": "device.json"
+                }
+            ]
+        }
+    ],
+    "enums": [
+        {
+            "className": "EMetronomeMode",
+            "description": "Режим метронома",
+            "useLocalization": "true",
+            "dataTypeFile": "e_metronome_mode.json"
+        }
+    ]
+}

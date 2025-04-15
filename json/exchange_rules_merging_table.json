@@ -1,0 +1,28 @@
+{
+    "typeName": "ExchangeRulesMergingTable",
+    "databaseType": "СлужебныеСправочникиПравилаОбменаПравилаСлияния.Строка",
+    "databaseTypeNamespace": "CognitiveTraining.Метаданные._SystemTables",
+    "fields": [
+        {
+            "name": "Id",
+            "databaseName": "Идентификатор",
+            "type": "String",
+            "isPrimary": "true"
+        },
+        {
+            "name": "Owner",
+            "databaseName": "Владелец",
+            "type": "Reference<ExchangeRules>"
+        },
+        {
+            "name": "FieldName",
+            "databaseName": "НазваниеПоля",
+            "type": "String"
+        },
+        {
+            "name": "PriorityForClient",
+            "databaseName": "ПриоритетКлиента",
+            "type": "bool"
+        }
+    ]
+}

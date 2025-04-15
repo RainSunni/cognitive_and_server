@@ -1,0 +1,41 @@
+{
+    "typeName": "TrainingSeries",
+    "databaseType": "СерииТренировок",
+    "databaseTypeNamespace": "CognitiveTraining.Метаданные.Справочники",
+    "lastEditedFieldName": "DateEdited",
+    "isDistributed": "true",
+    "fields": [
+        {
+            "name": "Id",
+            "databaseName": "Идентификатор",
+            "type": "String",
+            "isPrimary": "true"
+        },
+        {
+            "name": "DateEdited",
+            "databaseName": "ДатаПоследнегоИзменения",
+            "type": "DateTime"
+        },
+        {
+            "name": "Name",
+            "databaseName": "Наименование",
+            "description": "Имя",
+            "type": "String"
+        },
+        {
+            "name": "Comment",
+            "databaseName": "Комментарий",
+            "type": "String"
+        },
+        {
+            "name": "PauseSeconds",
+            "databaseName": "ДлительностьПаузы",
+            "type": "int"
+        },
+        {
+            "name": "Table",
+            "databaseName": "Таблица",
+            "type": "List<TrainingSeriesTableRow>"
+        }
+    ]
+}

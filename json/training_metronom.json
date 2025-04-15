@@ -1,0 +1,58 @@
+{
+    "typeName": "TrainingMetronom",
+    "databaseType": "УпражнениеСМетрономом",
+    "databaseTypeNamespace": "CognitiveTraining.Метаданные.Справочники",
+    "lastEditedFieldName": "DateEdited",
+    "isDistributed": "true",
+    "fields": [
+        {
+            "name": "Id",
+            "databaseName": "Идентификатор",
+            "type": "String",
+            "isPrimary": "true"
+        },
+        {
+            "name": "DateEdited",
+            "databaseName": "ДатаПоследнегоИзменения",
+            "type": "DateTime"
+        },
+        {
+            "name": "Name",
+            "databaseName": "Наименование",
+            "description": "Имя",
+            "type": "String"
+        },
+        {
+            "name": "Comment",
+            "databaseName": "Комментарий",
+            "type": "String",
+            "maxLength": 0
+        },
+        {
+            "name": "initialBpm",
+            "databaseName": "НачальныйТемп",
+            "type": "int"
+        },
+        {
+            "name": "targetBpm",
+            "databaseName": "ЦелевойТемп",
+            "type": "int",
+            "maxLength": 0
+        },
+        {
+            "name": "intervalProcent",
+            "databaseName": "ПроцентИзменения",
+            "type": "int"
+        },
+        {
+            "name": "delayTime",
+            "databaseName": "ВремяОжидания",
+            "type": "int"
+        },
+        {
+            "name": "metronomeMode",
+            "databaseName": "РежимМетронома",
+            "type": "Enum<EMetronomeMode>"
+        }
+    ]
+}

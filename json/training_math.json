@@ -1,0 +1,57 @@
+{
+    "typeName": "TrainingMath",
+    "databaseType": "МатематическоеУпражнение",
+    "databaseTypeNamespace": "CognitiveTraining.Метаданные.Справочники",
+    "lastEditedFieldName": "DateEdited",
+    "isDistributed": "true",
+    "fields": [
+        {
+            "name": "Id",
+            "databaseName": "Идентификатор",
+            "type": "String",
+            "isPrimary": "true"
+        },
+        {
+            "name": "DateEdited",
+            "databaseName": "ДатаПоследнегоИзменения",
+            "type": "DateTime"
+        },
+        {
+            "name": "Name",
+            "databaseName": "Наименование",
+            "description": "Имя",
+            "type": "String"
+        },
+        {
+            "name": "Comment",
+            "databaseName": "Комментарий",
+            "type": "String",
+            "maxLength": 0
+        },
+        {
+            "name": "useAddition",
+            "databaseName": "ИспользоватьСложение",
+            "type": "bool"
+        },
+        {
+            "name": "useSubtraction",
+            "databaseName": "ИспользоватьВычитание",
+            "type": "bool"
+        },
+        {
+            "name": "useMultiplication",
+            "databaseName": "ИспользоватьУмножение",
+            "type": "bool"
+        },
+        {
+            "name": "minNumber",
+            "databaseName": "МинимальноеЗначение",
+            "type": "int"
+        },
+        {
+            "name": "maxNumber",
+            "databaseName": "МаксимальноеЗначение",
+            "type": "int"
+        }
+    ]
+}

@@ -1,0 +1,43 @@
+{
+    "typeName": "ExchangeRules",
+    "databaseType": "ПравилаОбмена",
+    "databaseTypeNamespace": "CognitiveTraining.Метаданные.СлужебныеСправочники",
+    "fields": [
+        {
+            "name": "Id",
+            "databaseName": "Идентификатор",
+            "type": "String",
+            "isPrimary": "true"
+        },
+        {
+            "name": "Name",
+            "databaseName": "Наименование",
+            "type": "String"
+        },
+        {
+            "name": "ObjectType",
+            "databaseName": "Тип",
+            "type": "String"
+        },
+        {
+            "name": "LastExchangeDate",
+            "databaseName": "ДатаПоследнегоОбмена",
+            "type": "DateTime"
+        },
+        {
+            "name": "Periodicity",
+            "databaseName": "Периодичность",
+            "type": "int"
+        },
+        {
+            "name": "PriorityForClient",
+            "databaseName": "ПриоритетКлиента",
+            "type": "bool"
+        },
+        {
+            "name": "MergingRules",
+            "databaseName": "ПравилаСлияния",
+            "type": "List<ExchangeRulesMergingTable>"
+        }
+    ]
+}
