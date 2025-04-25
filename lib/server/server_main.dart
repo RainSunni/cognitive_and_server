@@ -98,12 +98,29 @@ class ESP32Server {
   static int _instanceCount = 0;
   static int _handleWebSocketCallCount = 0;
 
+  static ESP32Server? _instance; // Единственный экземпляр
+  HttpServer? _server; // Серверный сокет
+  bool _isRunning = false; // Флаг, чтобы отслеживать состояние сервера
+
+  // Приватный конструктор
+  ESP32Server._internal({this.port = 5900, this.subnet = '192.168.1'}) {
+    _instanceCount++;
+    print('Создан экземпляр ESP32Server. Всего экземпляров: $_instanceCount');
+    _loadKnownDevices(); // Загрузка устройств при создании
+  }
+
   // ESP32Server({this.port = 5900, this.subnet = '10.11.0'}) {
-  ESP32Server({this.port = 5900, this.subnet = '192.168.1'}) {
+  /*ESP32Server({this.port = 5900, this.subnet = '192.168.1'}) {
     _instanceCount++;
     print('Создан экземпляр ESP32Server. Всего экземпляров: $_instanceCount');
     _setupRoutes();
     _loadKnownDevices();
+  }*/
+
+  // Фабричный конструктор для Singleton
+  factory ESP32Server({int port = 5900, String subnet = '192.168.1'}) {
+    _instance ??= ESP32Server._internal(port: port, subnet: subnet);
+    return _instance!;
   }
 
   void startInactivityCheck() {
@@ -514,23 +531,36 @@ class ESP32Server {
   }
 
   Future<void> start() async {
-    Logger.root.level = Level.ALL;
-    Logger.root.onRecord.listen((record) {
-      print('${record.time}: ${record.level.name}: ${record.message}');
-    });
+    if (_isRunning) {
+      logger.info('Сервер уже запущен, повторный запуск не требуется');
+      return;
+    }
 
-    serverIp = await getLocalIP(subnet);
-    logger.info('Server IP address: $serverIp');
-    startInactivityCheck();
+    try {
+      Logger.root.level = Level.ALL;
+      Logger.root.onRecord.listen((record) {
+        print('${record.time}: ${record.level.name}: ${record.message}');
+      });
 
-    final handler = const Pipeline()
-        .addMiddleware(logRequests())
-        .addMiddleware(_corsMiddleware)
-        .addHandler(router);
+      serverIp = await getLocalIP(subnet);
+      logger.info('Server IP address: $serverIp');
+      startInactivityCheck();
 
-    final server = await shelf_io.serve(handler, serverIp, port);
-    logger
-        .info('Server started on http://${server.address.host}:${server.port}');
+      final handler = const Pipeline()
+          .addMiddleware(logRequests())
+          .addMiddleware(_corsMiddleware)
+          .addHandler(router);
+
+      final server = await shelf_io.serve(handler, serverIp, port);
+      _isRunning = true;
+      logger
+          .info(
+          'Server started on http://${server.address.host}:${server.port}');
+    } catch (e) {
+      logger.severe('Ошибка при запуске сервера: $e');
+      _isRunning = false;
+      rethrow;
+    }
   }
 
   Middleware get _corsMiddleware {
