@@ -24,6 +24,7 @@ dependencies:
   shelf_web_socket: ^1.0.4
   logging: ^1.2.0
   json_annotation: ^4.8.1
+  provider: ^6.0.0
 
   intl: any
   flutter_svg: ^2.0.10+1

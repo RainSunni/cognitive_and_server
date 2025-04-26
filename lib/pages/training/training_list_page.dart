@@ -11,6 +11,7 @@ import 'package:nsg_data/nsg_data.dart';
 import 'package:cognitive_training/server/main_app.dart'; // Импорт серверного интерфейса
 import 'package:cognitive_training/server/main_app.dart';
 import 'package:cognitive_training/server/server_main.dart';
+import 'package:cognitive_training/slave/slave_device_screen.dart';
 
 
 import '../../app_pages.dart';
@@ -102,10 +103,12 @@ class TrainingListPage extends StatelessWidget {
                           color: Colors.white,
                           backColor: nsgtheme.colorPrimary,
                           onPressed: () {
-                            Get.put(DeviceSlaveController(), permanent: true);
-                            Get.find<DeviceSlaveController>().startServer();
-                            NsgNavigator.push(Routes.deviceSlavePage);
-                          },
+
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => SlaveDeviceScreen() ),
+                            ); //Navigator.push
+                          }, // onPresser
                         ),
                       ),
                     ],
