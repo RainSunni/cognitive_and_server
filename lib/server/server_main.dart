@@ -41,23 +41,27 @@ class AppLifecycleManager {
 class KnownDevice {
   final String guid;
   final String ipAddress;
+  final int port; //добавляем знания о порте устройства
   final DateTime lastSeen;
 
   KnownDevice({
     required this.guid,
     required this.ipAddress,
+    required this.port,
     required this.lastSeen,
   });
 
   Map<String, dynamic> toJson() => {
         'guid': guid,
         'ipAddress': ipAddress,
+        'port': port,
         'lastSeen': lastSeen.toIso8601String(),
       };
 
   factory KnownDevice.fromJson(Map<String, dynamic> json) => KnownDevice(
         guid: json['guid'],
         ipAddress: json['ipAddress'],
+        port: json['port'] ?? 80,
         lastSeen: DateTime.parse(json['lastSeen']),
       );
 }
@@ -254,7 +258,7 @@ class ESP32Server {
         logger.info(
             'Attempting to connect to known device ${device.guid} at ${device.ipAddress}');
 
-        final ws = await WebSocket.connect('ws://${device.ipAddress}:80')
+        final ws = await WebSocket.connect('ws://${device.ipAddress}:${device.port}') //подключем не к конкретному порту, а к полученному
             .timeout(const Duration(milliseconds: 4000));
 
         final socket = IOWebSocketChannel(ws);
@@ -327,7 +331,7 @@ class ESP32Server {
     // Создаем список Future для параллельного сканирования
     final scanFutures = <Future<void>>[];
 
-    for (int i = 0; i <= 255; i++) {
+    for (int i = 0; i <= 190; i++) {
       final ip = '$subnet.$i';
 
       // Создаем Future для каждого IP ОДИН раз
@@ -388,6 +392,7 @@ class ESP32Server {
               knownDevices[deviceId!] = KnownDevice(
                 guid: deviceId!,
                 ipAddress: ipAddress,
+                port: data['port'] ?? 80, //добавляем порт
                 lastSeen: DateTime.now(),
               );
               _saveKnownDevices(); // Сохраняем на диск
