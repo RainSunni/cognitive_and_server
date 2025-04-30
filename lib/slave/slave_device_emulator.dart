@@ -3,7 +3,10 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shelf/shelf_io.dart' as io;
+import 'package:shelf_web_socket/shelf_web_socket.dart';
 
+// логика эмулятора слейв режима
 
 class SlaveDeviceEmulator {
   static final SlaveDeviceEmulator _instance = SlaveDeviceEmulator._internal();
@@ -22,9 +25,7 @@ class SlaveDeviceEmulator {
 
   late String _uuid; // уникальный id устройства
 
-  ServerSocket? _tcpServer;
-  final int _tcpPort = 5901; // порт для TCP-подключений
-  final List<Socket> _connectedClients = [];
+  final int _tcpPort = 5901; // порт для WebSocket-подключений
 
   Future<void> start() async {
     if (_isRunning) return;
@@ -34,41 +35,43 @@ class SlaveDeviceEmulator {
     _udpSocket?.broadcastEnabled = true;
     _udpSocket?.listen(_handleUdpPacket);
 
-    _tcpServer = await ServerSocket.bind(InternetAddress.anyIPv4, _tcpPort);
-    _tcpServer?.listen(_handleTcpConnection);
+    // WebSocket сервер
+    final handler = webSocketHandler((WebSocket socket) {
+      print('К серверу подключился WebSocket клиент');
+
+      // Отправка identify при подключении
+      socket.add(jsonEncode({
+        'type': 'identify',
+        'deviceId': _uuid,
+        'port': _tcpPort,
+      }));
+
+      socket.listen(
+            (data) {
+          print('Получено по WebSocket: $data');
+          // Здесь можно обработать команды, обновить интерфейс и т.д.
+        },
+        onDone: () {
+          print('Клиент отключился');
+        },
+        onError: (error) {
+          print('Ошибка WebSocket: $error');
+        },
+      );
+    });
+
+    final server = await io.serve(handler, InternetAddress.anyIPv4, _tcpPort);
+    print('Slave WebSocket server started on ws://${server.address.host}:$_tcpPort');
 
     _isRunning = true;
     print('Slave device started on UDP port $_listenPort with UUID $_uuid');
   }
 
-  void _handleTcpConnection(Socket client) {
-    print('Client connected: ${client.remoteAddress.address}:${client.remotePort}');
-    _connectedClients.add(client);
-
-    // _onConnected(); // Вот здесь ты можешь обновлять матрицу
-
-    client.listen(
-          (data) {
-        print('Received data: ${utf8.decode(data)}');
-        // Тут можно будет потом добавить реакцию на команды
-      },
-      onDone: () {
-        print('Client disconnected: ${client.remoteAddress.address}:${client.remotePort}');
-        _connectedClients.remove(client);
-      },
-      onError: (error) {
-        print('Client error: $error');
-        _connectedClients.remove(client);
-      },
-    );
-  }
-
   void stop() {
     _udpSocket?.close();
     _udpSocket = null;
-    _tcpServer?.close();
-    _tcpServer = null;
     _isRunning = false;
+    // WebSocket сервер shelf автоматически закрывается с приложением
   }
 
   void _handleUdpPacket(RawSocketEvent event) {
@@ -98,7 +101,7 @@ class SlaveDeviceEmulator {
       'deviceType': _deviceType,
       'deviceName': _deviceName,
       'uuid': _uuid,
-      'port': _tcpPort, // <<<< ОБЯЗАТЕЛЬНО добавь эту строчку ПОРТ
+      'port': _tcpPort, // ВАЖНО: отправляем порт WebSocket
     };
 
     final data = utf8.encode(json.encode(response));
@@ -112,15 +115,5 @@ class SlaveDeviceEmulator {
     final values = List<int>.generate(16, (i) => random.nextInt(256));
     return values.map((v) => v.toRadixString(16).padLeft(2, '0')).join();
   }
-
- /* void _onConnected() {
-    // Здесь мы будем зажигать все лампочки
-    _onUpdate?.call(
-      SlaveDeviceState(
-        ledMatrix: List.generate(8, (_) => List.filled(8, true)),
-        ledRing: List.filled(12, true),
-        isConnected: true,
-      ),
-    );
-  } */
 }
+

@@ -4,6 +4,8 @@ import 'slave_device_emulator.dart';
 import 'widgets/led_matrix.dart';
 import 'widgets/led_ring.dart';
 
+//интерфейс
+
 class SlaveDeviceScreen extends StatefulWidget {
   @override
   _SlaveDeviceScreenState createState() => _SlaveDeviceScreenState();
