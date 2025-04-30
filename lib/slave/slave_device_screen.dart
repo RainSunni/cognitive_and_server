@@ -19,21 +19,14 @@ class _SlaveDeviceScreenState extends State<SlaveDeviceScreen> {
   @override
   void initState() {
     super.initState();
-    _emulator = SlaveDeviceEmulator(
-      onLog: (message) {
-        setState(() {
-          _logs.add('${DateTime.now().toLocal()}: $message');
-          if (_logs.length > 20) _logs.removeAt(0);
-        });
-      },
-    );
+    _emulator = SlaveDeviceEmulator();
   }
 
   @override
   void dispose() {
-    _emulator.stop();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {

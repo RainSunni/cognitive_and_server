@@ -4,124 +4,123 @@ import 'dart:math';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
+
 class SlaveDeviceEmulator {
-  static const int _port = 5000;
-  static const String _broadcastAddress = '255.255.255.255';
-  static const String _discoveryMessage = 'COG_DEVICE_DISCOVERY';
+  static final SlaveDeviceEmulator _instance = SlaveDeviceEmulator._internal();
+
+  factory SlaveDeviceEmulator() {
+    return _instance;
+  }
+
+  SlaveDeviceEmulator._internal();
 
   RawDatagramSocket? _udpSocket;
-  Timer? _broadcastTimer;
-  String _deviceId = 'Slave-${Random().nextInt(9000) + 1000}';
   bool _isRunning = false;
-  final ValueChanged<String>? onLog;
+  final int _listenPort = 5900; // Порт на который приходит сканирование
+  final String _deviceName = "Slave Device";
+  final String _deviceType = "light"; // Имя и тип устройства
 
-  SlaveDeviceEmulator({this.onLog});
+  late String _uuid; // уникальный id устройства
+
+  ServerSocket? _tcpServer;
+  final int _tcpPort = 5901; // порт для TCP-подключений
+  final List<Socket> _connectedClients = [];
 
   Future<void> start() async {
     if (_isRunning) return;
+    _uuid = _generateUuid();
 
-    try {
-      _udpSocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, _port);
-      _udpSocket!.broadcastEnabled = true;
+    _udpSocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, _listenPort, reuseAddress: true);
+    _udpSocket?.broadcastEnabled = true;
+    _udpSocket?.listen(_handleUdpPacket);
 
-      _startBroadcasting();
-      _startListening();
+    _tcpServer = await ServerSocket.bind(InternetAddress.anyIPv4, _tcpPort);
+    _tcpServer?.listen(_handleTcpConnection);
 
-      _isRunning = true;
-      onLog?.call('Slave mode started. Device ID: $_deviceId');
-    } catch (e) {
-      onLog?.call('Error starting slave mode: $e');
-      rethrow;
-    }
+    _isRunning = true;
+    print('Slave device started on UDP port $_listenPort with UUID $_uuid');
   }
 
-  void _startBroadcasting() {
-    _broadcastTimer = Timer.periodic(Duration(seconds: 1), (_) async {
-      try {
-        final interfaces = await NetworkInterface.list();
+  void _handleTcpConnection(Socket client) {
+    print('Client connected: ${client.remoteAddress.address}:${client.remotePort}');
+    _connectedClients.add(client);
 
-        for (var interface in interfaces) {
-          // Пропускаем не-WiFi интерфейсы
-          if (!_isWifiInterface(interface.name)) continue;
+    // _onConnected(); // Вот здесь ты можешь обновлять матрицу
 
-          for (var address in interface.addresses) {
-            if (address.type != InternetAddressType.IPv4 || address.isLoopback) continue;
-
-            final message = '$_discoveryMessage:$_deviceId:${address.address}:$_port';
-            _sendBroadcast(message, address);
-          }
-        }
-      } catch (e) {
-        onLog?.call('Broadcast error: $e');
-      }
-    });
-  }
-
-  bool _isWifiInterface(String name) {
-    return name.toLowerCase().contains('wlan') ||
-        name.toLowerCase().contains('wifi') ||
-        name.toLowerCase().contains('ap');
-  }
-
-  void _sendBroadcast(String message, InternetAddress localAddress) {
-    try {
-      _udpSocket?.send(
-        utf8.encode(message),
-        InternetAddress(_broadcastAddress),
-        _port,
-      );
-      onLog?.call('Broadcast sent: $message from ${localAddress.address}');
-    } catch (e) {
-      onLog?.call('Send error: $e');
-    }
-  }
-
-  void _startListening() {
-    _udpSocket?.listen((RawSocketEvent event) {
-      if (event == RawSocketEvent.read) {
-        final datagram = _udpSocket?.receive();
-        if (datagram != null) {
-          final message = utf8.decode(datagram.data);
-          onLog?.call('Received: $message from ${datagram.address.address}');
-          _handleIncomingMessage(message, datagram.address);
-        }
-      }
-    });
-  }
-
-  void _handleIncomingMessage(String message, InternetAddress sender) {
-    if (message.startsWith('COG_SERVER_DISCOVERY')) {
-      final response = 'COG_DEVICE_RESPONSE:$_deviceId';
-      _udpSocket?.send(
-        utf8.encode(response),
-        sender,
-        _port,
-      );
-      onLog?.call('Responded to server discovery');
-    }
+    client.listen(
+          (data) {
+        print('Received data: ${utf8.decode(data)}');
+        // Тут можно будет потом добавить реакцию на команды
+      },
+      onDone: () {
+        print('Client disconnected: ${client.remoteAddress.address}:${client.remotePort}');
+        _connectedClients.remove(client);
+      },
+      onError: (error) {
+        print('Client error: $error');
+        _connectedClients.remove(client);
+      },
+    );
   }
 
   void stop() {
-    _broadcastTimer?.cancel();
     _udpSocket?.close();
+    _udpSocket = null;
+    _tcpServer?.close();
+    _tcpServer = null;
     _isRunning = false;
-    onLog?.call('Slave mode stopped');
   }
 
-  Future<List<InternetAddress>> getNetworkInterfaces() async {
-    final interfaces = await NetworkInterface.list();
-    final addresses = <InternetAddress>[];
+  void _handleUdpPacket(RawSocketEvent event) {
+    if (event == RawSocketEvent.read) {
+      final datagram = _udpSocket?.receive();
+      if (datagram == null) return;
 
-    for (var interface in interfaces) {
-      if (!_isWifiInterface(interface.name)) continue;
+      final data = utf8.decode(datagram.data);
+      print('Received UDP packet: $data');
 
-      for (var address in interface.addresses) {
-        if (address.type == InternetAddressType.IPv4 && !address.isLoopback) {
-          addresses.add(address);
+      try {
+        final Map<String, dynamic> message = json.decode(data);
+
+        if (message['cmd'] == 'scan') {
+          _sendInfoResponse(datagram.address, datagram.port);
         }
+      } catch (e) {
+        print('Error parsing UDP message: $e');
       }
     }
-
-    return addresses;
   }
+
+  void _sendInfoResponse(InternetAddress address, int port) {
+    final response = {
+      'cmd': 'info',
+      'type': 'device',
+      'deviceType': _deviceType,
+      'deviceName': _deviceName,
+      'uuid': _uuid,
+      'port': _tcpPort, // <<<< ОБЯЗАТЕЛЬНО добавь эту строчку ПОРТ
+    };
+
+    final data = utf8.encode(json.encode(response));
+    _udpSocket?.send(data, address, port);
+
+    print('Sent device info to ${address.address}:$port');
+  }
+
+  String _generateUuid() {
+    final random = Random();
+    final values = List<int>.generate(16, (i) => random.nextInt(256));
+    return values.map((v) => v.toRadixString(16).padLeft(2, '0')).join();
+  }
+
+ /* void _onConnected() {
+    // Здесь мы будем зажигать все лампочки
+    _onUpdate?.call(
+      SlaveDeviceState(
+        ledMatrix: List.generate(8, (_) => List.filled(8, true)),
+        ledRing: List.filled(12, true),
+        isConnected: true,
+      ),
+    );
+  } */
 }
