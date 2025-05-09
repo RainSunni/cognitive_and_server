@@ -331,7 +331,7 @@ class ESP32Server {
     // Создаем список Future для параллельного сканирования
     final scanFutures = <Future<void>>[];
 
-    for (int i = 0; i <= 190; i++) {
+    for (int i = 0; i <= 10; i++) {
       final ip = '$subnet.$i';
 
       // Создаем Future для каждого IP ОДИН раз
